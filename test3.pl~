@@ -1,0 +1,69 @@
+% This buffer is for notes you don't want to save.
+% If you want to create a file, visit that file with C-x C-f,
+% then enter the text in that file's own buffer.
+
+:-dynamic(edge/3).
+:-dynamic(node/1).
+
+menu :- write('1. Insert node.\n'),
+	write('2. Remove node.\n'),
+	write('3. Insert edge.\n'),
+	write('4. Remove edge.\n'),
+	write('5. Show graph.\n'),
+	write('6. Exit.\n'),
+	read(X), menu(X), !.
+menu(6) :- !.
+menu(1):- write('Node: ' ),
+    read(X),not(node(X)),assert(node(X)),
+    menu,!.
+menu(2) :- write('Node: ' ),
+    read(X) , retractall(edge(_,X,_)), retractall(edge(X,_,_)), retract(node(X)),    menu,!.
+menu(3) :- write('Edge(X,Y,Z):'),
+    read(X), read(Y),read(Z) ,
+     node(X),node(Y), assert(edge(X,Y,Z)) ,  menu, !.
+
+menu(4) :-
+	write('Edge(X,Y,C): '),
+	read(X), read(Y), read(C),
+
+	    retract(edge(X, Y, C)),
+
+	menu, !.
+
+menu(5) :-
+
+            findall(X, node(X), Results),
+            write('Nodes: '),
+            write(Results),
+            write('\n'),
+            findall([Y,Z,C], edge(Y,Z,C), Edges),
+            write('Edges: '),
+            write(Edges),
+            write('\n'),
+		menu, !.
+
+
+
+:-dynamic(muzeu/3).
+probl(muzeu(Nume,_,_)) :- atom_chars(Nume,L),nth0(0,L,'L').
+
+menu1:- write('1.Adauga muzeu\n'),
+    write('2. Sterge muzeu\n'),
+    write('3.Afis muzeu\n'),
+    write('4.Afis muzeu cu litera L si pret = M\n'),
+    write('5.Conditie\n'),
+    write('6.Exit\n'),
+   read(X), menu1(X) , !.
+
+menu1(6):- !.
+menu1(1) :- write('Muzeu(Nume,P,T)'),
+    read(Nume),read(P),read(T),
+    not(muzeu(Nume,P,T)), assert(muzeu(Nume,P,T)),menu1 , !.
+menu1(2) :- write('Muzeu(Nume,P,T)'),
+    read(Nume),
+    retract(muzeu(Nume,_,_)), menu1, !.
+menu1(3) :- findall([Nume,P,T],muzeu(Nume,P,T), Rez),
+    write("MUZEE:"),
+    write(Rez),write('\n'), menu1,!.
+menu1(4) :- findall([Nume,P,T],probl(Nume,P,T),Rez),
+	write(Rez),menu1,!.
